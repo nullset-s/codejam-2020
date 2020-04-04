@@ -1,49 +1,75 @@
-def compute(matrix):
-    hashmap = dict()
-    for i in range(len(matrix)):
-        g = matrix[i]
-        if (g[0], g[1]) not in hashmap:
-            hashmap[(g[0], g[1])] = []
-        hashmap[(g[0], g[1])].append(i)
-        if len(hashmap[(g[0], g[1])]) > 2:
-            return "IMPOSSIBLE"
+import java.io.*;
+import java.util.*;
 
-    sch = sorted(matrix)
-    j = c = -99999
-    final_op = [None] * len(sch)
+public class Solution{
 
-    for i in range(len(sch)):
-        activity = sch[i]
-        if j <= activity[0]:
-            if not final_op[hashmap[(activity[0], activity[1])][0]]:
-                final_op[hashmap[(activity[0], activity[1])][0]] = "C"
-            else:
-                final_op[hashmap[(activity[0], activity[1])][1]] = "C"
-            j = activity[1]
+    static int sqr[][]=new int[60][60];
+    static int n,k,t;
+    static boolean row_safe[][]=new boolean[60][60];
+    static boolean col_safe[][]=new boolean[60][60];
+    static boolean flag;
 
-        elif c <= activity[0]:
-            if not final_op[hashmap[(activity[0], activity[1])][0]]:
-                final_op[hashmap[(activity[0], activity[1])][0]] = "J"
-            else:
-                final_op[hashmap[(activity[0], activity[1])][1]] = "J"
-            c = activity[1]
+    static void solver(int row,int col,int m)
+    {
+        if(row==n&&col==n+1&&m==k&&!flag)
+        {
+            flag=true;
+            System.out.println("Case #"+t+ ": POSSIBLE");
+            for (int i=1;i<=n;++i)
+            {
+                for (int j=1;j<=n;++j)
+                {
+                    System.out.print(sqr[i][j]+ " ");
+                }
+                System.out.println();
+            }
+            return;
+        }
+        else if(row>n)
+        {
+            return;
+        }
+        else if(col>n)
+        {
+            solver(row+1,1,m);
+        }
+        for(int i=1;i<=n&&!flag;++i)
+        {
+            if (!row_safe[row][i]&&!col_safe[col][i])
+            {
+                row_safe[row][i]=col_safe[col][i]=true;
+                if (row==col)
+                {
+                    m+=i;
+                }
+                sqr[row][col]=i;
 
-        elif j > activity[0] and c > activity[0]:  #
-            return "IMPOSSIBLE"
+                solver(row,col+1,m);
 
-    return ''.join(final_op)
+                row_safe[row][i]=col_safe[col][i]=false;
+                if (row==col)
+                {
+                    m-=i;
+                }
+                sqr[row][col]=0;
+            }
+        }
+    }
 
-
-T = int(input())
-for i in range(1, T + 1):
-    N = int(input())
-    mat = []
-    for j in range(N):
-        mat.append(input().split(" "))
-
-    for row in range(len(mat)):
-        for col in range(len(mat[0])):
-            mat[row][col] = int(mat[row][col])
-
-
-    print("Case #{}: {}".format(i, compute(mat)))
+   public static void main(String[] args)
+    {
+        Scanner sc=new Scanner(System.in);
+        int T;
+        T=sc.nextInt();
+        for(t=1;t<=T;t++)
+        {
+            n=sc.nextInt();
+            k=sc.nextInt();
+            solver(1,1,0);
+            if(!flag)
+            {
+                System.out.println("Case #"+t+": "+"IMPOSSIBLE");
+            }
+            flag=false;
+        }
+    }
